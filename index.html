@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新年倒计时 | 跨年彩蛋</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #0f1a2b;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 40, 40, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 20%);
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 90%;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            z-index: 10;
+            position: relative;
+        }
+        
+        header {
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            color: #ff6b6b;
+            margin-bottom: 30px;
+        }
+        
+        .year-display {
+            font-size: 8rem;
+            font-weight: bold;
+            color: #ff4757;
+            text-shadow: 0 0 20px rgba(255, 71, 87, 0.7);
+            margin: 20px 0;
+            line-height: 1;
+        }
+        
+        .countdown-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px auto;
+            max-width: 800px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .countdown-title {
+            font-size: 1.8rem;
+            color: #ffd700;
+            margin-bottom: 25px;
+        }
+        
+        .countdown {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .countdown-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px 15px;
+            min-width: 120px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        
+        .countdown-number {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #ffd700;
+            line-height: 1;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        .countdown-label {
+            font-size: 1.2rem;
+            color: #ffb8b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .message {
+            font-size: 1.8rem;
+            color: #70a1ff;
+            margin: 40px 0;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(112, 161, 255, 0.1);
+            border-left: 5px solid #70a1ff;
+            max-width: 800px;
+        }
+        
+        .egg-triggered {
+            display: none;
+            font-size: 1.5rem;
+            color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        
+        footer {
+            margin-top: 40px;
+            color: #aaa;
+            font-size: 1rem;
+        }
+        
+        /* 彩蛋样式 */
+        .firework {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 15px;
+            height: 15px;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .new-year-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 6rem;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            z-index: 100;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .lights {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+            overflow: hidden;
+        }
+        
+        .light {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: #fff;
+            box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8);
+            animation: twinkle 3s infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .year-display {
+                font-size: 5rem;
+            }
+            
+            .countdown-number {
+                font-size: 2.5rem;
+            }
+            
+            .countdown-item {
+                min-width: 90px;
+                padding: 15px 10px;
+            }
+            
+            .new-year-text {
+                font-size: 3rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .countdown {
+                gap: 10px;
+            }
+            
+            .countdown-item {
+                min-width: 70px;
+                padding: 10px 5px;
+            }
+            
+            .countdown-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="lights" id="lights"></div>
+    
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-calendar-star"></i> 新年倒计时</h1>
+            <p class="subtitle">距离下一个农历新年还有</p>
+            <div class="year-display" id="nextYear">2025</div>
+        </header>
+        
+        <main>
+            <div class="countdown-container">
+                <h2 class="countdown-title"><i class="fas fa-hourglass-half"></i> 倒计时</h2>
+                <div class="countdown">
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="days">00</div>
+                        <div class="countdown-label">天</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="hours">00</div>
+                        <div class="countdown-label">小时</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="minutes">00</div>
+                        <div class="countdown-label">分钟</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="seconds">00</div>
+                        <div class="countdown-label">秒</div>
+                    </div>
+                </div>
+                
+                <div class="egg-triggered" id="eggTriggered">
+                    <i class="fas fa-gift"></i> 新年快乐！跨年彩蛋已触发！
+                </div>
+            </div>
+            
+            <div class="message" id="message">
+                倒计时归零时，将自动触发跨年彩蛋效果，迎接新年的到来！
+            </div>
+        </main>
+        
+        <footer>
+            <p>Made with <i class="fas fa-heart" style="color:#ff4757;"></i> for 新年快乐 | 部署于 GitHub Pages</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">打开此页面等待倒计时结束或手动点击触发彩蛋</p>
+            <button id="manualTrigger" style="margin-top: 15px; padding: 10px 20px; background: linear-gradient(45deg, #ff4757, #ff6b81); color: white; border: none; border-radius: 50px; font-size: 1rem; cursor: pointer; box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);">
+                <i class="fas fa-bolt"></i> 手动触发彩蛋
+            </button>
+        </footer>
+    </div>
+    
+    <div class="new-year-text" id="newYearText">新年快乐！</div>
+
+    <script>
+        // 设置下一个农历新年的日期（2025年春节是1月29日）
+        // 注意：这里使用的是公历日期，实际农历新年日期可能有所不同
+        // 您可以根据需要修改这个日期
+        const nextLunarNewYear = new Date('2025-01-29T00:00:00').getTime();
+        
+        // 获取DOM元素
+        const daysElement = document.getElementById('days');
+        const hoursElement = document.getElementById('hours');
+        const minutesElement = document.getElementById('minutes');
+        const secondsElement = document.getElementById('seconds');
+        const nextYearElement = document.getElementById('nextYear');
+        const messageElement = document.getElementById('message');
+        const eggTriggeredElement = document.getElementById('eggTriggered');
+        const newYearTextElement = document.getElementById('newYearText');
+        const manualTriggerButton = document.getElementById('manualTrigger');
+        const lightsContainer = document.getElementById('lights');
+        
+        // 下一个新年年份
+        const nextYear = 2025;
+        nextYearElement.textContent = nextYear;
+        
+        // 创建闪烁的星光
+        function createLights() {
+            const lightCount = 100;
+            for (let i = 0; i < lightCount; i++) {
+                const light = document.createElement('div');
+                light.classList.add('light');
+                light.style.left = `${Math.random() * 100}%`;
+                light.style.top = `${Math.random() * 100}%`;
+                light.style.animationDelay = `${Math.random() * 5}s`;
+                lightsContainer.appendChild(light);
+            }
+        }
+        
+        // 烟花效果
+        function createFirework(x, y, color) {
+            const firework = document.createElement('div');
+            firework.classList.add('firework');
+            firework.style.left = `${x}px`;
+            firework.style.top = `${y}px`;
+            firework.style.backgroundColor = color;
+            document.body.appendChild(firework);
+            
+            // 烟花爆炸效果
+            const particles = 30;
+            for (let i = 0; i < particles; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.classList.add('firework');
+                    particle.style.left = `${x}px`;
+                    particle.style.top = `${y}px`;
+                    particle.style.backgroundColor = color;
+                    document.body.appendChild(particle);
+                    
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 2 + Math.random() * 3;
+                    const vx = Math.cos(angle) * speed;
+                    const vy = Math.sin(angle) * speed;
+                    
+                    let posX = x;
+                    let posY = y;
+                    
+                    const animateParticle = () => {
+                        posX += vx;
+                        posY += vy;
+                        particle.style.left = `${posX}px`;
+                        particle.style.top = `${posY}px`;
+                        
+                        // 粒子减速
+                        particle.style.opacity = parseFloat(particle.style.opacity || 1) - 0.02;
+                        
+                        if (parseFloat(particle.style.opacity || 1) > 0) {
+                            requestAnimationFrame(animateParticle);
+                        } else {
+                            document.body.removeChild(particle);
+                        }
+                    };
+                    
+                    animateParticle();
+                }, i * 20);
+            }
+            
+            // 移除烟花主体
+            setTimeout(() => {
+                document.body.removeChild(firework);
+            }, 1000);
+        }
+        
+        // 五彩纸屑效果
+        function createConfetti() {
+            const confettiCount = 150;
+            const colors = ['#ffd700', '#ff4757', '#2ed573', '#1e90ff', '#ff6b81'];
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.top = `-10px`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                document.body.appendChild(confetti);
+                
+                // 随机动画
+                const duration = 3 + Math.random() * 2;
+                const horizontalMovement = (Math.random() - 0.5) * 200;
+                
+                confetti.animate([
+                    { transform: `translate(0, 0) rotate(0deg)`, opacity: 1 },
+                    { transform: `translate(${horizontalMovement}px, 100vh) rotate(${360 * 3}deg)`, opacity: 0 }
+                ], {
+                    duration: duration * 1000,
+                    easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)'
+                });
+                
+                // 移除纸屑
+                setTimeout(() => {
+                    document.body.removeChild(confetti);
+                }, duration * 1000);
+            }
+        }
+        
+        // 显示新年祝福文字
+        function showNewYearText() {
+            newYearTextElement.style.opacity = 1;
+            newYearTextElement.style.transform = 'translate(-50%, -50%) scale(1)';
+            newYearTextElement.style.transition = 'all 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            
+            // 文字闪烁效果
+            let scale = 1;
+            const pulseInterval = setInterval(() => {
+                scale = scale === 1 ? 1.1 : 1;
+                newYearTextElement.style.transform = `translate(-50%, -50%) scale(${scale})`;
+            }, 800);
+            
+            // 10秒后停止闪烁
+            setTimeout(() => {
+                clearInterval(pulseInterval);
+                newYearTextElement.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 10000);
+        }
+        
+        // 触发跨年彩蛋
+        function triggerNewYearEgg() {
+            // 显示彩蛋触发提示
+            eggTriggeredElement.style.display = 'block';
+            messageElement.textContent = "新年快乐！愿新的一年带给你健康、幸福和成功！";
+            messageElement.style.color = "#ffd700";
+            messageElement.style.borderLeftColor = "#ffd700";
+            messageElement.style.background = "rgba(255, 215, 0, 0.1)";
+            
+            // 显示新年文字
+            showNewYearText();
+            
+            // 创建烟花
+            const fireworkInterval = setInterval(() => {
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight * 0.8;
+                const colors = ['#ffd700', '#ff4757', '#2ed573', '#1e90ff', '#ff6b81'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                createFirework(x, y, color);
+            }, 300);
+            
+            // 创建五彩纸屑
+            const confettiInterval = setInterval(() => {
+                createConfetti();
+            }, 1500);
+            
+            // 播放新年音效（注释掉以避免自动播放问题）
+            // try {
+            //     const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-happy-new-year-sound-2996.mp3');
+            //     audio.play();
+            // } catch (e) {
+            //     console.log("音频播放失败:", e);
+            // }
+            
+            // 30秒后停止效果
+            setTimeout(() => {
+                clearInterval(fireworkInterval);
+                clearInterval(confettiInterval);
+            }, 30000);
+        }
+        
+        // 手动触发彩蛋
+        manualTriggerButton.addEventListener('click', () => {
+            triggerNewYearEgg();
+        });
+        
+        // 更新倒计时
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = nextLunarNewYear - now;
+            
+            // 如果倒计时结束
+            if (distance < 0) {
+                daysElement.textContent = "00";
+                hoursElement.textContent = "00";
+                minutesElement.textContent = "00";
+                secondsElement.textContent = "00";
+                
+                // 触发跨年彩蛋（只触发一次）
+                if (!window.eggTriggered) {
+                    window.eggTriggered = true;
+                    triggerNewYearEgg();
+                }
+                
+                return;
+            }
+            
+            // 计算天、时、分、秒
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            // 更新显示
+            daysElement.textContent = days < 10 ? `0${days}` : days;
+            hoursElement.textContent = hours < 10 ? `0${hours}` : hours;
+            minutesElement.textContent = minutes < 10 ? `0${minutes}` : minutes;
+            secondsElement.textContent = seconds < 10 ? `0${seconds}` : seconds;
+            
+            // 如果距离新年不到1分钟，改变颜色增加紧迫感
+            if (days === 0 && hours === 0 && minutes < 1) {
+                secondsElement.style.color = "#ff4757";
+                secondsElement.style.textShadow = "0 0 15px rgba(255, 71, 87, 0.9)";
+            }
+        }
+        
+        // 初始化
+        function init() {
+            createLights();
+            updateCountdown();
+            
+            // 每秒更新一次倒计时
+            setInterval(updateCountdown, 1000);
+            
+            // 页面加载时检查是否已经过了新年
+            const now = new Date().getTime();
+            if (now >= nextLunarNewYear) {
+                triggerNewYearEgg();
+            }
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
